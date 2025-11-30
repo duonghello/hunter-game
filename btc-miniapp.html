@@ -1,0 +1,73 @@
+!doctype html
+html
+head
+meta charset=utf-8
+titleBTC Prices MiniApptitle
+style
+body { font-family Arial; margin20px; }
+table { border-collapse collapse; width100%; max-width600px; }
+th, td { border1px solid #ddd; padding8px; text-alignleft; }
+thead { background#f0f0f0; }
+button { padding6px 12px; margin4px; }
+style
+head
+body
+h2Bitcoin — Bảng giá hàng ngàyh2
+
+labelDays
+select id=days
+  option value=11option
+  option value=7 selected7option
+  option value=3030option
+  option value=9090option
+  option value=maxMaxoption
+select
+label
+button onclick=loadData()Lấy dữ liệubutton
+button onclick=downloadTxt()Tạo file Notepadbutton
+
+p id=statusp
+
+table
+theadtrthNgàyththGiá (USD)thtrthead
+tbody id=tableBodytbody
+table
+
+script
+let rows = [];
+
+async function loadData() {
+  const days = document.getElementById('days').value;
+  document.getElementById('status').textContent = 'Đang tải...';
+  try {
+    const resp = await fetch(`httpsapi.coingecko.comapiv3coinsbitcoinmarket_chartvs_currency=usd&days=${days}&interval=daily`);
+    const data = await resp.json();
+    rows = data.prices.map(p={
+      const date = new Date(p[0]).toISOString().split('T')[0];
+      return {date, pricep[1].toFixed(2)};
+    });
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = rows.map(r=`trtd${r.date}tdtd${r.price}tdtr`).join('');
+    document.getElementById('status').textContent = 'Đã tải '+rows.length+' dòng';
+  } catch(e){
+    document.getElementById('status').textContent = 'Lỗi tải dữ liệu';
+  }
+}
+
+function downloadTxt() {
+  if(rows.length===0){ alert('Chưa có dữ liệu!'); return; }
+  let txt = 'DatetPrice (USD)n';
+  txt += rows.map(r=`${r.date}t${r.price}`).join('n');
+  const blob = new Blob([txt], {type'textplain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'btc-prices.txt';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+ Load mặc định 7 ngày
+loadData();
+script
+body
+html
